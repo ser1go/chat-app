@@ -11,6 +11,11 @@ app.secret_key = 'позже'
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///project.db'
 db=SQLAlchemy(app)
 
+#Настройка фласк-логин
+login = LoginManager
+login.init_app(app)
+    
+
 @app.route("/", methods=['GET', 'POST'])
 def index():
     reg_form = Registration_form()
