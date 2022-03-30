@@ -1,6 +1,8 @@
+import imp
 from flask import Flask, redirect, render_template, url_for
 from wtform_fields import *
 from models import *
+from flask_login import LoginManager
 #Конфигурация приложения
 app = Flask(__name__)
 app.secret_key = 'позже'
