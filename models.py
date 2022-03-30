@@ -1,6 +1,6 @@
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
-from app.py import *
+from flask_login import UserMixin
 db=SQLAlchemy()
 
 class User(UserMixin, db.Model):

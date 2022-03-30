@@ -1,8 +1,7 @@
-import imp
 from flask import Flask, redirect, render_template, url_for
 from wtform_fields import *
 from models import *
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 #Конфигурация приложения
 app = Flask(__name__)
 app.secret_key = 'позже'
@@ -12,9 +11,12 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///project.db'
 db=SQLAlchemy(app)
 
 #Настройка фласк-логин
-login = LoginManager
+login = LoginManager(app)
 login.init_app(app)
-    
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -34,8 +36,21 @@ def login():
     log_form=Login_form()
     #Если подтверждение произошло и ошибок не возникло, то:
     if log_form.validate_on_submit(): 
-        return 'Добро пожаловать'
+        user_object= User.query.filter_by(username=log_form.username_enter.data).first()
+        login_user(user_object)
+        return redirect(url_for('chat'))
     return render_template('login.html', form=log_form)
+
+@app.route('/chat', methods=['GET', 'POST'])
+def chat():
+    if not current_user.is_authenticated:
+            return 'Вы не аутентифицированы, пожалуйста, осуществите вход'
+    return 'Общайтесь наздоровье'
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    return 'Вы вышли из аккаунта'
 if __name__ == "__main__":
     
     app.run(debug=True)
