@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, redirect, render_template, url_for, flash
 from wtform_fields import *
 from models import *
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
@@ -29,9 +29,11 @@ def index():
         user = User(username=username, password=hashd_pass)
         db.session.add(user)
         db.session.commit()
+        flash('Регистрация прошла успешно. Пожалуйста, осуществите вход в систему.', 'success')
+
         return redirect(url_for('login'))
     return render_template('index.html', form=reg_form)
-@app.route('/login.html',methods=['GET','POST'])
+@app.route('/login',methods=['GET','POST'])
 def login():
     log_form=Login_form()
     #Если подтверждение произошло и ошибок не возникло, то:
@@ -44,13 +46,15 @@ def login():
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
     if not current_user.is_authenticated:
-            return 'Вы не аутентифицированы, пожалуйста, осуществите вход'
+           flash('Вы не аутентифицированы', 'error')
+           return redirect(url_for('login'))
     return 'Общайтесь наздоровье'
 
 @app.route('/logout', methods=['GET'])
 def logout():
     logout_user()
-    return 'Вы вышли из аккаунта'
+    flash('Выход из аккаунта осуществлён успешно.', 'success')
+    return redirect(url_for('login'))
 if __name__ == "__main__":
     
     app.run(debug=True)
