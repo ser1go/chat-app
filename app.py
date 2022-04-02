@@ -1,8 +1,9 @@
+from distutils.log import debug
 from flask import Flask, redirect, render_template, url_for, flash
 from wtform_fields import *
 from models import *
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send
 #Конфигурация приложения
 app = Flask(__name__)
 app.secret_key = 'позже'
@@ -10,6 +11,10 @@ app.secret_key = 'позже'
 #Конфигурация БД
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///project.db'
 db=SQLAlchemy(app)
+
+
+#Инициализация Фласк SocketIO
+socketio = SocketIO(app)
 
 #Настройка фласк-логин
 login = LoginManager(app)
@@ -49,13 +54,20 @@ def chat():
     if not current_user.is_authenticated:
            flash('Вы не аутентифицированы', 'error')
            return redirect(url_for('login'))
-    return 'Общайтесь наздоровье'
+    return render_template('chat.html')
 
 @app.route('/logout', methods=['GET'])
 def logout():
     logout_user()
     flash('Выход из аккаунта осуществлён успешно.', 'success')
     return redirect(url_for('login'))
+
+
+@socketio.on('message')
+def message(data):
+    print(f"\n\n{data}\n\n")
+    send(data)
+
+
 if __name__ == "__main__":
-    
-    app.run(debug=True)
+    socketio.run(app, debug=True)

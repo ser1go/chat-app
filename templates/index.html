@@ -29,7 +29,7 @@
                 {% endfor %}
             </ul>
         </div >
-        <input type="submit" value="Подтвердить регистрацию">
+        <input type="submit" class="submit_log" value="Подтвердить регистрацию">
         <a href="{{url_for('login')}}">У меня уже есть аккаунт</a>
         {{ form.csrf_token }}
     </form>
