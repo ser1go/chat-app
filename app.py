@@ -1,9 +1,10 @@
-from distutils.log import debug
+import imp
+from time import localtime, strftime
 from flask import Flask, redirect, render_template, url_for, flash
 from wtform_fields import *
 from models import *
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send, emit
 #Конфигурация приложения
 app = Flask(__name__)
 app.secret_key = 'позже'
@@ -51,10 +52,10 @@ def login():
 
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
-    if not current_user.is_authenticated:
-           flash('Вы не аутентифицированы', 'error')
-           return redirect(url_for('login'))
-    return render_template('chat.html')
+    # if not current_user.is_authenticated:
+    #        flash('Вы не аутентифицированы', 'danger')
+    #        return redirect(url_for('login'))
+    return render_template('chat.html', username=current_user.username)
 
 @app.route('/logout', methods=['GET'])
 def logout():
@@ -66,7 +67,7 @@ def logout():
 @socketio.on('message')
 def message(data):
     print(f"\n\n{data}\n\n")
-    send(data)
+    send({'msg': data['msg'], 'username': data ['username'], 'time_stamp':strftime('%d %H:%M', localtime())})
 
 
 if __name__ == "__main__":
