@@ -1,4 +1,3 @@
-import imp
 from time import localtime, strftime
 from flask import Flask, redirect, render_template, url_for, flash
 from wtform_fields import *
@@ -66,8 +65,13 @@ def logout():
 
 @socketio.on('message')
 def message(data):
-    print(f"\n\n{data}\n\n")
+    # print(f"\n\n{data}\n\n")
     send({'msg': data['msg'], 'username': data ['username'], 'time_stamp':strftime('%d %H:%M', localtime())})
+    user_send=data['username']
+    message_send=data ['msg']
+    message_obj = Messages(username=user_send, message=message_send)
+    db.session.add(message_obj)
+    db.session.commit()
 
 
 if __name__ == "__main__":
